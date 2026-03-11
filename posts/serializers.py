@@ -3,6 +3,14 @@ from .models import Post, Like
 from comments.serializers import CommentSerializer
 
 
+class PostListSerializer(serializers.ModelSerializer):
+    detail_url = serializers.HyperlinkedIdentityField(view_name='post-detail')
+
+    class Meta:
+        model = Post
+        fields = ['id', 'title', 'description', 'image', 'created_at', 'detail_url', 'user']
+
+
 class PostSerializer(serializers.ModelSerializer):
     post_comments = CommentSerializer(many=True)
     likes_count = serializers.SerializerMethodField()

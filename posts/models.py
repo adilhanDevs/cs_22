@@ -7,6 +7,7 @@ class Post(models.Model):
     description = models.TextField(blank=True, verbose_name="Описание")
     image = models.FileField(upload_to="posts_images", blank=True, verbose_name="Картинка")
     created_at = models.DateField(auto_now_add=True, verbose_name="Дата создание")
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name="user_posts")
 
     def __str__(self):
         return self.title

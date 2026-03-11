@@ -5,13 +5,14 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 from .models import Post, Like
-from .serializers import PostSerializer, LikeSerializer
+from .serializers import PostSerializer, LikeSerializer, PostListSerializer
 from accounts.models import Account
 
 
 class PostListAPIView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = PostListSerializer
+    permission_classes = [permissions.AllowAny, ]
 
 
 class PostRetrieveAPIView(generics.RetrieveUpdateDestroyAPIView):
