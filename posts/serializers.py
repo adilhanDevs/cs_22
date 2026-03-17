@@ -11,6 +11,12 @@ class PostListSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'description', 'image', 'created_at', 'detail_url', 'user']
 
 
+class PostCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['title', 'description', 'image', 'user']
+
+
 class PostSerializer(serializers.ModelSerializer):
     post_comments = CommentSerializer(many=True)
     likes_count = serializers.SerializerMethodField()
