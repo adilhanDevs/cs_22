@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
+from accounts.views import AccountAPIView, AccountPostAPIView
+from comments.views import CommentListCreateAPIView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -26,12 +28,18 @@ from rest_framework_simplejwt.views import (
 api_urlpatterns = [
     path('', include('posts.urls')),
     path('accounts/', include('accounts.urls')),
+    path('comments/', include('comments.urls')),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/accounts', AccountAPIView.as_view(), name='accounts-no-slash'),
+    path('api/accounts/<int:pk>', AccountPostAPIView.as_view(), name='account-posts-no-slash'),
+    path('api/comments', CommentListCreateAPIView.as_view(), name='comment-list-no-slash'),
+    path('api/token', TokenObtainPairView.as_view(), name='token_obtain_pair_no_slash'),
+    path('api/token/refresh', TokenRefreshView.as_view(), name='token_refresh_no_slash'),
     path('api/', include(api_urlpatterns))
 ]
 

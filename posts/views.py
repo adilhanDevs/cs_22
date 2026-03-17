@@ -1,12 +1,15 @@
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import status
-from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 from .models import Post, Like
-from .serializers import PostSerializer, LikeSerializer, PostListSerializer, PostCreateSerializer
-from accounts.models import Account
+from .serializers import (
+    PostSerializer,
+    LikeSerializer,
+    LikeToggleSerializer,
+    PostListSerializer,
+    PostCreateSerializer,
+)
 
 
 class PostListAPIView(generics.ListCreateAPIView):
@@ -15,13 +18,13 @@ class PostListAPIView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, ]
 
     def post(self, request, *args, **kwargs):
-        data = request.POST.copy()
+        data = request.data.copy()
         data['user'] = request.user.id
         serializer = PostCreateSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-        else:
-            Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+        if not serializer.is_valid():
+            return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -33,20 +36,18 @@ class PostRetrieveAPIView(generics.RetrieveUpdateDestroyAPIView):
 class LikeAPIView(generics.ListCreateAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        try:
-            post = request.data['post']
-            account = request.data['account']
+        serializer = LikeToggleSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-            post = Post.objects.get(id=post)
-            account = Account.objects.get(id=account)
-            like_obj = Like.objects.filter(post=post, account=account).first()
-        except Exception as e:
-            return Response({"message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST)
+        post = serializer.validated_data['post']
+        like_obj = Like.objects.filter(post=post, account=request.user).first()
 
         if not like_obj:
-            Like.objects.create(post=post, account=account)
+            Like.objects.create(post=post, account=request.user)
         else:
             like_obj.delete()
             return Response({"message": "Like was delete"}, status=status.HTTP_200_OK)

@@ -11,3 +11,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_account_name(self, obj):
         return obj.account.name
+
+
+class CommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'text', 'post']
+
+    def validate_text(self, value):
+        value = value.strip()
+        if not value:
+            raise serializers.ValidationError('Comment text cannot be empty.')
+        return value

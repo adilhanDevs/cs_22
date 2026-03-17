@@ -33,3 +33,7 @@ class LikeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Like
         fields = '__all__'
+
+
+class LikeToggleSerializer(serializers.Serializer):
+    post = serializers.PrimaryKeyRelatedField(queryset=Post.objects.all())
