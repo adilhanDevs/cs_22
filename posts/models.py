@@ -30,3 +30,4 @@ class Like(models.Model):
         verbose_name_plural = "Лайки"
         unique_together = ("account", "post")
         # constraints = [models.UniqueConstraint(fields=["account", "post"], name="unique Like")]
+        #hello from adilhan
